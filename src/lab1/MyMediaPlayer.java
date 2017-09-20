@@ -1,6 +1,10 @@
 package lab1;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -42,7 +46,8 @@ import javafx.stage.Stage;
 
 public class MyMediaPlayer extends Application {
 
-		private final String folder2 = "/home/mandy/eclipe-workspace/DSP_Lab1/folder2";
+		//private final String folder2 = "/home/mandy/eclipe-workspace/DSP_Lab1/folder2";
+		private final String folder2 = "H:\\DistributedSysProg\\dsp\\folder2";
 	
 		private MonitorFolder monitorFolder1;
 		private MonitorFolder monitorFolder2;
@@ -121,12 +126,7 @@ public class MyMediaPlayer extends Application {
 			    HBox hbBtnPlay = new HBox(10);
 			    hbBtn.getChildren().add(btnPlay);
 			    grid.add(hbBtnPlay, 0,4);
-			    
-			    btnMove = new Button("Move");
-			    HBox hbBtnMove = new HBox(10);
-			    hbBtn.getChildren().add(btnMove);
-			    grid.add(hbBtnMove, 1,4);
-			    
+			    		    
 			    btnPlay.setDisable(true);
 			    btnPlay.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -140,6 +140,41 @@ public class MyMediaPlayer extends Application {
 											
 					}
 				});
+			    
+			    btnMove = new Button("Move");
+			    HBox hbBtnMove = new HBox(10);
+			    hbBtn.getChildren().add(btnMove);
+			    grid.add(hbBtnMove, 1,4);
+			    
+			    btnMove.setOnAction(new EventHandler<ActionEvent>() {
+
+					@Override
+					public void handle(ActionEvent event) {
+						// open file and copy it to other folder
+						String originalFileName = listView.getSelectionModel().getSelectedItem();
+						String newFilePath = folder2 + File.separator + originalFileName;
+						File newFile = new File(newFilePath);
+						
+						try {
+							monitorFolder1.openFile(originalFileName);
+							DataOutputStream dout = new DataOutputStream(new FileOutputStream(newFile));
+							byte b = 0;
+							while(b!=-1) {
+								b = monitorFolder1.getB();
+								if (b == -1) break;
+								System.out.println("Byte " + b);
+								dout.writeByte(b);
+							}
+							dout.close();
+							checkForFileLocation(originalFileName);
+							
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+				});
+			    
 				btnMove.setDisable(true);
 			    
 			    // Set the scene
@@ -175,14 +210,14 @@ public class MyMediaPlayer extends Application {
                 
                 listOfFilesFolder1.clear();
                 listOfFilesFolder1 = new ArrayList<>(Arrays.asList(monitorFolder1.getNames()));
-                populateList();
+                populateUIList();
                 
                 btnMove.setDisable(true);
                 btnPlay.setDisable(true);
              }	
 		}
 		
-		private void populateList() {
+		private void populateUIList() {
 			
 			ObservableList<String> items = FXCollections.observableArrayList(listOfFilesFolder1);
 		    listView.setItems(items);

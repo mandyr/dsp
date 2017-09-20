@@ -1,5 +1,7 @@
 package lab1;
 
+import java.io.IOException;
+
 public interface ReadFolders {
 
 	/**
@@ -13,8 +15,8 @@ public interface ReadFolders {
 	
 	boolean checkBool();
 	String[] getNames();
-	boolean openFile(String name);
-	byte getB();
+	boolean openFile(String name) throws Exception;
+	byte getB() throws IOException;
 	boolean closeFile(String name);
 	boolean checkForChange();
 	
