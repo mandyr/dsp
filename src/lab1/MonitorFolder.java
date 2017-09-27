@@ -22,6 +22,7 @@ public class MonitorFolder implements ReadFolders {
 	private int numberOfFiles = 0;
 	private File openedFile;
 	private DataInputStream dataInputStream; 
+	private boolean endOfFile = false;
 	
 	public MonitorFolder(String folderName) {
 		this.folderPath = folderName;
@@ -29,8 +30,7 @@ public class MonitorFolder implements ReadFolders {
 	
 	@Override
 	public boolean checkBool() {
-		// TODO Auto-generated method stub
-		return false;
+		return endOfFile;
 	}
 
 	@Override
@@ -53,36 +53,43 @@ public class MonitorFolder implements ReadFolders {
 	}
 
 	@Override
-	public boolean openFile(String name) throws Exception {
+	public boolean openFile(String name) {
 		// opens a file called name
 		
 		String filePath = folderPath + File.separator + name;
 		openedFile = new File(filePath);
-
-		try {			
-			dataInputStream = new DataInputStream(new FileInputStream(openedFile));
+	
+			try {
+				dataInputStream = new DataInputStream(new FileInputStream(openedFile));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 			return true;
-		} catch (FileNotFoundException e) {
-			throw e;
-		}
+		
 	}
 
 	@Override
-	public byte getB() throws IOException {
+	public byte getB(){
 		//Gets a byte from the currently open file
-		byte c = 0;
+		int c = 0;
 		try {
-			c = dataInputStream.readByte();
-			return c;
+			c = dataInputStream.read();
+			if (c== -1) endOfFile = true;
 		} catch (IOException e) {
-			throw e;
-		}	
+			e.printStackTrace();
+		}
+		return (byte)c;
 	}
 
 	@Override
 	public boolean closeFile(String name) {
 		// closes the open file 
-		
+		try {
+			dataInputStream.close();
+			System.out.println("Original file closed");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 

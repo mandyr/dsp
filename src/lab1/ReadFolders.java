@@ -15,8 +15,8 @@ public interface ReadFolders {
 	
 	boolean checkBool();
 	String[] getNames();
-	boolean openFile(String name) throws Exception;
-	byte getB() throws IOException;
+	boolean openFile(String name);
+	byte getB();
 	boolean closeFile(String name);
 	boolean checkForChange();
 	

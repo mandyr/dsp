@@ -4,6 +4,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -157,21 +158,23 @@ public class MyMediaPlayer extends Application {
 						
 						try {
 							monitorFolder1.openFile(originalFileName);
-							DataOutputStream dout = new DataOutputStream(new FileOutputStream(newFile));
-							byte b = 0;
-							while(b!=-1) {
-								b = monitorFolder1.getB();
-								if (b == -1) break;
-								System.out.println("Byte " + b);
-								dout.writeByte(b);
+							//DataOutputStream dout = new DataOutputStream(new FileOutputStream(newFile));
+							FileOutputStream fos = new FileOutputStream(newFilePath);
+
+							int c = 0;
+							while(true) {
+								if(monitorFolder1.checkBool()) break;
+								c = monitorFolder1.getB();
+								fos.write(c);
 							}
-							dout.close();
-							checkForFileLocation(originalFileName);
 							
+							monitorFolder1.closeFile(originalFileName);
+							fos.close();
+							
+							checkForFileLocation(originalFileName);
 						} catch (Exception e) {
 							e.printStackTrace();
-						}
-						
+						} 						
 					}
 				});
 			    
