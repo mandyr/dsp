@@ -10,6 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -69,6 +71,7 @@ public class MyMediaPlayer extends Application {
 		private Text chooseAFolder;
 		private Button btnPlay;
 		private Button btnMove;
+		private ExecutorService exService;
 		
 		
 		@Override
@@ -77,6 +80,8 @@ public class MyMediaPlayer extends Application {
 				
 				// Define Monitor folder for folder 2
 				monitorFolder2 = new MonitorFolder(folder2);
+				
+				exService = Executors.newSingleThreadExecutor();
 				
 				this.stage = primaryStage;
 						    
@@ -153,28 +158,38 @@ public class MyMediaPlayer extends Application {
 					public void handle(ActionEvent event) {
 						// open file and copy it to other folder
 						String originalFileName = listView.getSelectionModel().getSelectedItem();
-						String newFilePath = folder2 + File.separator + originalFileName;
-						File newFile = new File(newFilePath);
 						
+						String newFilePath = folder2 + File.separator + originalFileName;
+						FileCopier<Void> fileCopier = new FileCopier<>(monitorFolder1, newFilePath, originalFileName);
 						try {
-							monitorFolder1.openFile(originalFileName);
-							//DataOutputStream dout = new DataOutputStream(new FileOutputStream(newFile));
-							FileOutputStream fos = new FileOutputStream(newFilePath);
-
-							int c = 0;
-							while(true) {
-								if(monitorFolder1.checkBool()) break;
-								c = monitorFolder1.getB();
-								fos.write(c);
-							}
+							exService.submit(fileCopier);
 							
-							monitorFolder1.closeFile(originalFileName);
-							fos.close();
-							
-							checkForFileLocation(originalFileName);
 						} catch (Exception e) {
+							// TODO Auto-generated catch block
 							e.printStackTrace();
-						} 						
+						}
+						
+//						String newFilePath = folder2 + File.separator + originalFileName;
+//						File newFile = new File(newFilePath);
+//						
+//						try {
+//							monitorFolder1.openFile(originalFileName);
+//							FileOutputStream fos = new FileOutputStream(newFilePath);
+//
+//							int c = 0;
+//							while(true) {
+//								if(monitorFolder1.checkBool()) break;
+//								c = monitorFolder1.getB();
+//								fos.write(c);
+//							}
+//							
+//							monitorFolder1.closeFile(originalFileName);
+//							fos.close();
+//							
+//							checkForFileLocation(originalFileName);
+//						} catch (Exception e) {
+//							e.printStackTrace();
+//						} 						
 					}
 				});
 			    
@@ -213,16 +228,16 @@ public class MyMediaPlayer extends Application {
                 
                 listOfFilesFolder1.clear();
                 listOfFilesFolder1 = new ArrayList<>(Arrays.asList(monitorFolder1.getNames()));
-                populateUIList();
+                populateUIList(listOfFilesFolder1);
                 
                 btnMove.setDisable(true);
                 btnPlay.setDisable(true);
              }	
 		}
 		
-		private void populateUIList() {
+		public void populateUIList(ArrayList<String> listOfFiles) {
 			
-			ObservableList<String> items = FXCollections.observableArrayList(listOfFilesFolder1);
+			ObservableList<String> items = FXCollections.observableArrayList(listOfFiles);
 		    listView.setItems(items);
 		}
 		

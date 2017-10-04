@@ -14,15 +14,19 @@ import java.io.FileNotFoundException;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Observable;
 
 
-public class MonitorFolder implements ReadFolders {
+public class MonitorFolder extends Observable implements ReadFolders  {
 
 	private String folderPath = null;
 	private int numberOfFiles = 0;
 	private File openedFile;
 	private DataInputStream dataInputStream; 
 	private boolean endOfFile = false;
+	private ArrayList<File> currentFiles = null; 
+	private int checkInterval = 5000;
 	
 	public MonitorFolder(String folderName) {
 		this.folderPath = folderName;
@@ -96,6 +100,22 @@ public class MonitorFolder implements ReadFolders {
 	@Override
 	public boolean checkForChange() {
 		// sets a bool if a file has been added
+		
+		ArrayList<File> newFileList = new ArrayList<File>();
+
+	    for (File fileEntry : new File(folderPath).listFiles())
+	        if ((System.currentTimeMillis() - fileEntry.lastModified()) <= checkInterval)
+	            newFileList.add(fileEntry);
+
+	    for (File File : newFileList)
+	        System.out.println(File.getName());
+
+	    try {
+			Thread.sleep(checkInterval);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	    
 		return false;
 	}
 
