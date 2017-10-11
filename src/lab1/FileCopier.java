@@ -11,6 +11,8 @@ public class FileCopier <Void> extends Task<Void>{
 	private String fileName;
 	private MonitorFolder sourceFolder;
 	
+	private boolean running = false;
+	private boolean finished = false;
 	
 	public FileCopier(MonitorFolder monitorFolder, String newFilePath, String fileName) {
 		this.sourceFolder = monitorFolder;
@@ -22,12 +24,16 @@ public class FileCopier <Void> extends Task<Void>{
 	    protected void succeeded() {
 	        super.succeeded();
 	        // e.g. show "copy finished" dialog
+	        System.out.println("FileCopier finished");
+	        finished = true;
 	    }
 
 	    @Override
 	    protected void running() {
 	        super.running();
 	        // e.g. change mouse courser
+	        System.out.println("FileCopier running");
+	        running = true;
 	    }
 
 	    @Override

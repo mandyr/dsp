@@ -17,7 +17,9 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -47,7 +49,8 @@ import javafx.stage.Stage;
  *  a file it must move the file to folder2. Button play is then enabled after a move and button move is disabled.  
  */
 
-public class MyMediaPlayer extends Application {
+public class MyMediaPlayer extends Application implements 	EventHandler<ActionEvent>, 
+															ListChangeListener<Object> {
 
 		//private final String folder2 = "/home/mandy/eclipe-workspace/DSP_Lab1/folder2";
 		private final String folder2 = "H:\\DistributedSysProg\\dsp\\folder2";
@@ -62,6 +65,9 @@ public class MyMediaPlayer extends Application {
 		private ArrayList<String> listOfFilesFolder1 = new ArrayList<String>();
 		private ArrayList<String> listOfFilesFolder2 = new ArrayList<String>();
 		
+		private ObservableList<File> observableListOfFilesF1 = null;
+		private ObservableList<String> observableListOfNamesF1 = null;
+		
 		// UI Elements
 		private Group root;
 		private Scene scene;
@@ -71,6 +77,7 @@ public class MyMediaPlayer extends Application {
 		private Text chooseAFolder;
 		private Button btnPlay;
 		private Button btnMove;
+		private Button btnOpenDirectory;
 		private ExecutorService exService;
 		
 		
@@ -101,18 +108,12 @@ public class MyMediaPlayer extends Application {
 			    chooseAFolder.setFont(Font.font("Roboto", FontWeight.NORMAL, 16));
 			    grid.add(chooseAFolder, 0,1,1,1);
 			    
-			    Button btn = new Button("Choose folder");
+			    btnOpenDirectory = new Button("Choose folder");
 			    HBox hbBtn = new HBox(10);
-			    hbBtn.getChildren().add(btn);
+			    hbBtn.getChildren().add(btnOpenDirectory);
 			    grid.add(hbBtn, 0,2,1,1);
 			    
-			    btn.setOnAction(new EventHandler<ActionEvent>() {
-			    	 
-			        @Override
-			        public void handle(ActionEvent e) {
-			            openDirectoryChooser();
-			        }
-			    });
+			    btnOpenDirectory.setOnAction(this);
 			    
 			    listView = new ListView<String>();
 			    listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
@@ -133,66 +134,15 @@ public class MyMediaPlayer extends Application {
 			    hbBtn.getChildren().add(btnPlay);
 			    grid.add(hbBtnPlay, 0,4);
 			    		    
+			    btnPlay.setOnAction(this);
 			    btnPlay.setDisable(true);
-			    btnPlay.setOnAction(new EventHandler<ActionEvent>() {
-
-					@Override
-					public void handle(ActionEvent event) {
-						String path = folderPath + "/" + listView.getSelectionModel().getSelectedItem();
-						
-						File file = new File(path);
-						String song = file.toURI().toASCIIString();
-						playSong(song);
-											
-					}
-				});
 			    
 			    btnMove = new Button("Move");
 			    HBox hbBtnMove = new HBox(10);
 			    hbBtn.getChildren().add(btnMove);
 			    grid.add(hbBtnMove, 1,4);
 			    
-			    btnMove.setOnAction(new EventHandler<ActionEvent>() {
-
-					@Override
-					public void handle(ActionEvent event) {
-						// open file and copy it to other folder
-						String originalFileName = listView.getSelectionModel().getSelectedItem();
-						
-						String newFilePath = folder2 + File.separator + originalFileName;
-						FileCopier<Void> fileCopier = new FileCopier<>(monitorFolder1, newFilePath, originalFileName);
-						try {
-							exService.submit(fileCopier);
-							
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-//						String newFilePath = folder2 + File.separator + originalFileName;
-//						File newFile = new File(newFilePath);
-//						
-//						try {
-//							monitorFolder1.openFile(originalFileName);
-//							FileOutputStream fos = new FileOutputStream(newFilePath);
-//
-//							int c = 0;
-//							while(true) {
-//								if(monitorFolder1.checkBool()) break;
-//								c = monitorFolder1.getB();
-//								fos.write(c);
-//							}
-//							
-//							monitorFolder1.closeFile(originalFileName);
-//							fos.close();
-//							
-//							checkForFileLocation(originalFileName);
-//						} catch (Exception e) {
-//							e.printStackTrace();
-//						} 						
-					}
-				});
-			    
+			    btnMove.setOnAction(this);
 				btnMove.setDisable(true);
 			    
 			    // Set the scene
@@ -228,17 +178,12 @@ public class MyMediaPlayer extends Application {
                 
                 listOfFilesFolder1.clear();
                 listOfFilesFolder1 = new ArrayList<>(Arrays.asList(monitorFolder1.getNames()));
-                populateUIList(listOfFilesFolder1);
+                observableListOfNamesF1 = FXCollections.observableArrayList(listOfFilesFolder1);
+                listView.setItems(observableListOfNamesF1);
                 
                 btnMove.setDisable(true);
                 btnPlay.setDisable(true);
              }	
-		}
-		
-		public void populateUIList(ArrayList<String> listOfFiles) {
-			
-			ObservableList<String> items = FXCollections.observableArrayList(listOfFiles);
-		    listView.setItems(items);
 		}
 		
 		private void checkForFileLocation(String filename) {
@@ -264,4 +209,53 @@ public class MyMediaPlayer extends Application {
 				btnMove.setDisable(false);
 			}
 		}
+		
+		@Override
+		public void handle(ActionEvent event) {
+			
+			if(event.getSource().equals(btnMove)) {
+				// open file and copy it to other folder
+				String originalFileName = listView.getSelectionModel().getSelectedItem();
+				
+				String newFilePath = folder2 + File.separator + originalFileName;
+				FileCopier<Void> fileCopier = new FileCopier<>(monitorFolder1, newFilePath, originalFileName);
+				try {
+					exService.submit(fileCopier);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			} else if (event.getSource().equals(btnPlay)) {
+				String path = folderPath + "/" + listView.getSelectionModel().getSelectedItem();
+				
+				File file = new File(path);
+				String song = file.toURI().toASCIIString();
+				playSong(song);
+				
+			} else if(event.getSource().equals(btnOpenDirectory)){
+				openDirectoryChooser();
+				observableListOfFilesF1 = monitorFolder1.getObservableList();
+				observableListOfNamesF1 = monitorFolder1.getObservableListOfNames();
+				observableListOfFilesF1.addListener(this);
+				
+				
+				// From now on start observing the folder
+				Thread observeMonitor = new Thread(() -> { 
+					while(true) {
+						monitorFolder1.checkForChange();
+					}
+				});
+				
+				exService.submit(observeMonitor);
+			}
+			
+		}
+
+		@Override
+		public void onChanged(Change<? extends Object> c) {
+			System.out.println("Detected a change in UI-Class!");
+			// Get only names from observable list 
+			listView.setItems(observableListOfNamesF1);
+		}
+			
 }

@@ -17,6 +17,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 
+import com.sun.javafx.collections.ObservableSequentialListWrapper;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+
 
 public class MonitorFolder extends Observable implements ReadFolders  {
 
@@ -26,10 +32,15 @@ public class MonitorFolder extends Observable implements ReadFolders  {
 	private DataInputStream dataInputStream; 
 	private boolean endOfFile = false;
 	private ArrayList<File> currentFiles = null; 
+	private ObservableList<File> observableListOfFiles = null;
+	private ObservableList<String> observableListOfNames = null;
 	private int checkInterval = 5000;
 	
 	public MonitorFolder(String folderName) {
 		this.folderPath = folderName;
+		currentFiles = new ArrayList<File>();
+		observableListOfFiles = FXCollections.observableList(currentFiles);
+		observableListOfNames = FXCollections.observableArrayList();
 	}
 	
 	@Override
@@ -47,6 +58,8 @@ public class MonitorFolder extends Observable implements ReadFolders  {
 		for(int i=0;i< files.length;i++) {
 			File file = files[i];
 			if(file.isFile()) {
+				observableListOfFiles.add(file);
+				observableListOfNames.add(file.getName().toString());
 				result[counter] = file.getName();
 				counter++;
 			}	
@@ -100,23 +113,44 @@ public class MonitorFolder extends Observable implements ReadFolders  {
 	@Override
 	public boolean checkForChange() {
 		// sets a bool if a file has been added
-		
-		ArrayList<File> newFileList = new ArrayList<File>();
+		boolean result = false;
 
-	    for (File fileEntry : new File(folderPath).listFiles())
-	        if ((System.currentTimeMillis() - fileEntry.lastModified()) <= checkInterval)
-	            newFileList.add(fileEntry);
-
-	    for (File File : newFileList)
-	        System.out.println(File.getName());
-
+		File[] listOfFiles = new File(folderPath).listFiles();
+	    for (File fileEntry : listOfFiles) {
+	        if (!fileContainedInOldList(fileEntry)) {
+	    		observableListOfFiles.add(fileEntry);
+	    		observableListOfNames.add(fileEntry.getName());
+	    		result = true;
+	        }
+	    }
+	    
 	    try {
 			Thread.sleep(checkInterval);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	    
-		return false;
+		return result;
 	}
+	
+	private boolean fileContainedInOldList(File file) {
+		boolean result = false;
+		for(File f : observableListOfFiles) {
+			if(f.getName().equals(file.getName())) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	public ObservableList<File> getObservableList(){
+		return this.observableListOfFiles;
+	}
+	
+	public ObservableList<String> getObservableListOfNames(){
+		return this.observableListOfNames;
+	}
+	
 
 }
