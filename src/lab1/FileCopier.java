@@ -40,6 +40,7 @@ public class FileCopier <Void> extends Task<Void>{
 	    protected void failed() {
 	        super.failed();
 	        // do stuff if call threw an excpetion
+	        System.out.println("FileCopier failed");
 	    }
 
 	@Override
@@ -47,18 +48,21 @@ public class FileCopier <Void> extends Task<Void>{
 		try {
 			sourceFolder.openFile(fileName);
 			FileOutputStream fos = new FileOutputStream(newFilePath);
-
+			
 			int c = 0;
 			while(true) {
 				if(sourceFolder.checkBool()) break;
 				c = sourceFolder.getB();
 				fos.write(c);
+				
 			}
 			
 			sourceFolder.closeFile(fileName);
 			fos.close();
+			succeeded();
 			
 		} catch (Exception e) {
+			failed();
 			e.printStackTrace();
 		} 	
 		return null;

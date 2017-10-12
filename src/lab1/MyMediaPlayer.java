@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.sun.javafx.geom.AreaOp.AddOp;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -88,7 +90,10 @@ public class MyMediaPlayer extends Application implements 	EventHandler<ActionEv
 				// Define Monitor folder for folder 2
 				monitorFolder2 = new MonitorFolder(folder2);
 				
-				exService = Executors.newSingleThreadExecutor();
+				// Add observer
+				
+				
+				exService = Executors.newCachedThreadPool();
 				
 				this.stage = primaryStage;
 						    
@@ -213,6 +218,7 @@ public class MyMediaPlayer extends Application implements 	EventHandler<ActionEv
 		@Override
 		public void handle(ActionEvent event) {
 			
+			// Action when "Move" is pressed
 			if(event.getSource().equals(btnMove)) {
 				// open file and copy it to other folder
 				String originalFileName = listView.getSelectionModel().getSelectedItem();
@@ -225,13 +231,15 @@ public class MyMediaPlayer extends Application implements 	EventHandler<ActionEv
 					e.printStackTrace();
 				}
 				
+			// Action when "Play" is pressed	
 			} else if (event.getSource().equals(btnPlay)) {
 				String path = folderPath + "/" + listView.getSelectionModel().getSelectedItem();
 				
 				File file = new File(path);
 				String song = file.toURI().toASCIIString();
 				playSong(song);
-				
+			
+			// Action when "Open Directory is pressed" is pressed
 			} else if(event.getSource().equals(btnOpenDirectory)){
 				openDirectoryChooser();
 				observableListOfFilesF1 = monitorFolder1.getObservableList();
@@ -253,7 +261,7 @@ public class MyMediaPlayer extends Application implements 	EventHandler<ActionEv
 
 		@Override
 		public void onChanged(Change<? extends Object> c) {
-			System.out.println("Detected a change in UI-Class!");
+			System.out.println("Detected a change in on observable list!");
 			// Get only names from observable list 
 			listView.setItems(observableListOfNamesF1);
 		}
