@@ -44,6 +44,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /*
+ * Linux Development: /usr/lib/jwm/java-8-openjdk/jre/lib/ext
+ * Windows Development:  C:/Program Files/Java/jre1.8.0_144/lib/ext/jfxrt.jar
+ * 
  * Write a class called myMediaPlayer (the client) which uses the class monitorFolder (containment not inheritance).
  *  It has a javaFX GUI. It displays the filesnames in folder1, followed by a play button and lastly a move button.
  *  
@@ -163,9 +166,9 @@ public class MyMediaPlayer extends Application implements 	EventHandler<ActionEv
 			}
 		}
 		
-		public static void main(String[] args) {
-			launch(args);
-		}
+//		public static void main(String[] args) {
+//			launch(args);
+//		}
 		
 		public void playSong(String fileName) {
 			Media pick = new Media(fileName);
