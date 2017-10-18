@@ -1,4 +1,4 @@
-package application;
+package services;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -19,28 +19,26 @@ import java.util.Observable;
 
 import com.sun.javafx.collections.ObservableSequentialListWrapper;
 
+import application.Configuration;
+import application.ReadFolders;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 
 public class MonitorFolder extends Observable implements ReadFolders  {
-
+		
 	private String folderPath = null;
-	private int numberOfFiles = 0;
 	private File openedFile;
 	private DataInputStream dataInputStream; 
 	private boolean endOfFile = false;
-	private ArrayList<File> currentFiles = null; 
-	private ObservableList<File> observableListOfFiles = null;
-	private ObservableList<String> observableListOfNames = null;
-	private int checkInterval = 5000;
 	
-	public MonitorFolder(String folderName) {
-		this.folderPath = folderName;
-		currentFiles = new ArrayList<File>();
-		observableListOfFiles = FXCollections.observableList(currentFiles);
-		observableListOfNames = FXCollections.observableArrayList();
+	private ObservableList<File> observableListOfFiles = null;
+	
+	
+	public MonitorFolder(String folderPath) {
+		this.folderPath = folderPath;
+		observableListOfFiles = FXCollections.observableList(new ArrayList<File>());
 	}
 	
 	@Override
@@ -59,13 +57,11 @@ public class MonitorFolder extends Observable implements ReadFolders  {
 			File file = files[i];
 			if(file.isFile()) {
 				observableListOfFiles.add(file);
-				observableListOfNames.add(file.getName().toString());
 				result[counter] = file.getName();
 				counter++;
 			}	
 		}
 			
-		numberOfFiles = result.length;
 		return result;
 	}
 
@@ -119,14 +115,13 @@ public class MonitorFolder extends Observable implements ReadFolders  {
 	    for (File fileEntry : listOfFiles) {
 	        if (!fileContainedInOldList(fileEntry)) {
 	    		observableListOfFiles.add(fileEntry);
-	    		observableListOfNames.add(fileEntry.getName());
 	    		result = true;
 	    		setChanged();
 	        }
 	    }
 	    
 	    try {
-			Thread.sleep(checkInterval);
+			Thread.sleep(Configuration.getInstance().getCheckInterval());
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -149,9 +144,6 @@ public class MonitorFolder extends Observable implements ReadFolders  {
 		return this.observableListOfFiles;
 	}
 	
-	public ObservableList<String> getObservableListOfNames(){
-		return this.observableListOfNames;
-	}
 	
 	public String getFolderPath() {
 		return this.folderPath;

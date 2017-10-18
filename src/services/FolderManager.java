@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import application.Configuration;
-import application.MonitorFolder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -17,6 +16,7 @@ public class FolderManager {
 	private ArrayList<String> remoteFolderFileNames;
 	
 	private static FolderManager folderManagerInstance;
+	private Configuration configInstance;
 	
 	public static FolderManager getInstance() {
 		
@@ -27,7 +27,8 @@ public class FolderManager {
 	}
 	
 	private FolderManager() {
-		monitorFolderRemote = new MonitorFolder(Configuration.remoteFolderPath);
+		configInstance = Configuration.getInstance();
+		monitorFolderRemote = new MonitorFolder(configInstance.getRemoteFolderPath());
 	}
 	
 	public MonitorFolder getMonitorFolderLocal() {
@@ -38,7 +39,8 @@ public class FolderManager {
 	}
 	
 	public ObservableList<String> getLocalFileNames(){
-		return localFolderFileNames = FXCollections.observableArrayList(new ArrayList<>(Arrays.asList(monitorFolderLocal.getNames())));	
+		localFolderFileNames = FXCollections.observableArrayList(new ArrayList<>(Arrays.asList(monitorFolderLocal.getNames())));
+		return localFolderFileNames;
 	}
 	
 	public String getLocalFolderPath() {
@@ -63,4 +65,7 @@ public class FolderManager {
 		return isLocatedInRemoteFolder;
 	}
 
+	public void changeRemoteFolder(MonitorFolder newMonitorFolder) {
+		this.monitorFolderRemote = newMonitorFolder;
+	}
 }

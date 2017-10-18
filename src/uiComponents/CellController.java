@@ -69,7 +69,7 @@ public class CellController {
 	@FXML 
 	public void onMoveClick() {
 		// open file and copy it to other folder	
-		String newFilePath = Configuration.remoteFolderPath + File.separator + songName.getText();
+		String newFilePath = Configuration.getInstance().getRemoteFolderPath() + File.separator + songName.getText();
 		FileCopier<Void> fileCopier = new FileCopier<>(folderManager.getMonitorFolderLocal(), newFilePath, songName.getText(), this);
 		try {
 			BackgroundService.getExecuterService().submit(fileCopier);

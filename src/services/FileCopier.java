@@ -3,7 +3,6 @@ package services;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import application.MonitorFolder;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
