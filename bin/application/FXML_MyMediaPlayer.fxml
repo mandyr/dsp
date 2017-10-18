@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+	
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="uiComponents.MyMediaPlayerController">
+<VBox prefHeight="600.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.162-ea" xmlns:fx="http://javafx.com/fxml/1">
+  <children>
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="474.0" prefWidth="483.0" VBox.vgrow="ALWAYS">
+      <children>
+            <Label layoutX="43.0" layoutY="29.0" text="My Media Player">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Button layoutX="42.0" layoutY="70.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="155.0" text="Choose folder" fx:id="buttonChooseFolder" 
+            		onAction="#onChooseFolderClick"/>
+            <Label layoutX="222.0" layoutY="75.0" text="Chosen folder name" fx:id="folderName"/>
+            <ListView layoutX="42.0" layoutY="146.0" prefHeight="349.0" prefWidth="415.0" fx:id="listViewFiles"/>
+            <Label layoutX="42.0" layoutY="116.0" text="List of files from chosen folder" />
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>
+</BorderPane>
