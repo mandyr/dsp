@@ -36,6 +36,9 @@ public class MyMediaPlayerController implements Initializable {
 	private Label folderName;
 	
 	@FXML
+	private Label aboveListview;
+	
+	@FXML
 	private Button buttonChooseFolder;
 	
 	@FXML
@@ -55,6 +58,9 @@ public class MyMediaPlayerController implements Initializable {
 		stage = new Stage();
 		folderManager = FolderManager.getInstance();
 		//buttonSettings.setDisable(true);
+		aboveListview.setText("List of files from remote folder\n "
+				+ "You can only play the song if it is in the local folder\n "
+				+ "To move the file to local folder press 'move'");
 		
 	}
 	
@@ -65,13 +71,13 @@ public class MyMediaPlayerController implements Initializable {
 		File selectedDirectory = directoryChooser.showDialog(stage);
         if (selectedDirectory != null) {
             folderName.setText("Selected Folder: " + selectedDirectory.getName());
-            folderManager.setMonitorFolderLocal(new MonitorFolder(selectedDirectory.getAbsolutePath()));
+            folderManager.setMonitorFolderRemote(new MonitorFolder(selectedDirectory.getAbsolutePath()));
             updateListView();
             
          // From now on start observing the folder
 			Thread observeMonitor = new Thread(() -> { 
 				while(true) {
-					if(folderManager.getMonitorFolderLocal().checkForChange()) {
+					if(folderManager.getMonitorFolderRemote().checkForChange()) {
 						Platform.runLater(new Runnable() {
 				            @Override
 				            public void run() {
@@ -90,7 +96,7 @@ public class MyMediaPlayerController implements Initializable {
 	
 	@SuppressWarnings("unchecked")
 	public void updateListView() {
-		listViewFiles.setItems(folderManager.getLocalFileNames());
+		listViewFiles.setItems(folderManager.getRemoteFileNames());
         listViewFiles.setCellFactory(new Callback<ListView<String>,javafx.scene.control.ListCell<String>>(){
         	
         	@Override

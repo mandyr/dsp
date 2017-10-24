@@ -2,12 +2,12 @@ package application;
 
 public class Configuration {
 	
-	public static final String remoteFolderPathDefault = "H:\\DistributedSysProg\\dsp\\folder2";
+	public static final String localFolderPathDefault = "H:\\DistributedSysProg\\dsp\\folderLocal";
 	//public static final String remoteFolderPath = "/home/mandy/eclipse-workspace/DSP/folder2";
 	public static final int checkIntervalDefault = 5000; // Check local folder every five seconds
 	
 	private static Configuration instance;
-	private String remoteFolderPath;
+	private String localFolderPath;
 	private int checkInterval;
 
 	public static Configuration getInstance() {
@@ -17,20 +17,20 @@ public class Configuration {
 	}
 	
 	private Configuration() {
-		remoteFolderPath = remoteFolderPathDefault;
+		localFolderPath = localFolderPathDefault;
 		checkInterval = checkIntervalDefault;
 	}
 
-	public String getRemoteFolderPath() {
-		return this.remoteFolderPath;
+	public String getLocalFolderPath() {
+		return this.localFolderPath;
 	}
 	
 	public int getCheckInterval() {
 		return this.checkInterval;
 	}
 	
-	public void setRemoteFolderPath(String newFolderPath) {
-		this.remoteFolderPath = newFolderPath;
+	public void setLocalFolderPath(String newFolderPath) {
+		this.localFolderPath = newFolderPath;
 	}
 	
 	public void setCheckInterval(int newInterval) {

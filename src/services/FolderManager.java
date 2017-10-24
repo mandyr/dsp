@@ -12,8 +12,10 @@ public class FolderManager {
 	private MonitorFolder monitorFolderLocal;
 	private MonitorFolder monitorFolderRemote;
 	
-	private ObservableList<String> localFolderFileNames;
+	private ObservableList<String> localFolderFileNamesObs;
+	private ObservableList<String> remoteFolderFileNamesObs;
 	private ArrayList<String> remoteFolderFileNames;
+	private ArrayList<String> localFolderFileNames;
 	
 	private static FolderManager folderManagerInstance;
 	private Configuration configInstance;
@@ -28,44 +30,62 @@ public class FolderManager {
 	
 	private FolderManager() {
 		configInstance = Configuration.getInstance();
-		monitorFolderRemote = new MonitorFolder(configInstance.getRemoteFolderPath());
+		monitorFolderLocal = new MonitorFolder(configInstance.getLocalFolderPath());
 	}
 	
 	public MonitorFolder getMonitorFolderLocal() {
 		return monitorFolderLocal;
 	}
+	
 	public void setMonitorFolderLocal(MonitorFolder monitorFolder) {
 		this.monitorFolderLocal = monitorFolder;
 	}
 	
+	public MonitorFolder getMonitorFolderRemote() {
+		return this.monitorFolderRemote;
+	}
+	
+	public void setMonitorFolderRemote(MonitorFolder monitorFolder) {
+		this.monitorFolderRemote = monitorFolder;
+	}
+	
 	public ObservableList<String> getLocalFileNames(){
-		localFolderFileNames = FXCollections.observableArrayList(new ArrayList<>(Arrays.asList(monitorFolderLocal.getNames())));
-		return localFolderFileNames;
+		localFolderFileNamesObs = FXCollections.observableArrayList(new ArrayList<>(Arrays.asList(monitorFolderLocal.getNames())));
+		return localFolderFileNamesObs;
+	}
+	
+	public ObservableList<String> getRemoteFileNames(){
+		remoteFolderFileNamesObs = FXCollections.observableArrayList(new ArrayList<>(Arrays.asList(monitorFolderRemote.getNames())));
+		return remoteFolderFileNamesObs;
 	}
 	
 	public String getLocalFolderPath() {
 		return monitorFolderLocal.getFolderPath();
 	}
 	
-	public boolean remoteFileExists(String fileName) {
-		boolean isLocatedInRemoteFolder = false;
+	public String getRemoteFolderPath() {
+		return monitorFolderRemote.getFolderPath();
+	}
+	
+	public boolean localFileExists(String fileName) {
+		boolean isLocatedInLocalFolder = false;
 		
 		// Get all files for folder locations
-		remoteFolderFileNames = new ArrayList<String>(Arrays.asList(monitorFolderRemote.getNames()));
+		localFolderFileNames = new ArrayList<String>(Arrays.asList(monitorFolderLocal.getNames()));
 					
 		// Check if File is present in folder 2
-			for (String song : remoteFolderFileNames) {
+			for (String song : localFolderFileNames) {
 				if(song == null)
 					continue;				
 				if(song.equals(fileName)) {
-					isLocatedInRemoteFolder = true;
+					isLocatedInLocalFolder = true;
 					break;
 				}
 			}
-		return isLocatedInRemoteFolder;
+		return isLocatedInLocalFolder;
 	}
 
-	public void changeRemoteFolder(MonitorFolder newMonitorFolder) {
-		this.monitorFolderRemote = newMonitorFolder;
+	public void changeLocalFolder(MonitorFolder newMonitorFolder) {
+		this.monitorFolderLocal = newMonitorFolder;
 	}
 }

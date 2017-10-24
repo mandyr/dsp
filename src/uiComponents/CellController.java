@@ -69,8 +69,8 @@ public class CellController {
 	@FXML 
 	public void onMoveClick() {
 		// open file and copy it to other folder	
-		String newFilePath = Configuration.getInstance().getRemoteFolderPath() + File.separator + songName.getText();
-		FileCopier<Void> fileCopier = new FileCopier<>(folderManager.getMonitorFolderLocal(), newFilePath, songName.getText(), this);
+		String newFilePath = Configuration.getInstance().getLocalFolderPath() + File.separator + songName.getText();
+		FileCopier<Void> fileCopier = new FileCopier<>(folderManager.getMonitorFolderRemote(), newFilePath, songName.getText(), this);
 		try {
 			BackgroundService.getExecuterService().submit(fileCopier);
 		} catch (Exception e) {
@@ -84,7 +84,7 @@ public class CellController {
 	}
 	
 	public void checkFileLocation() {
-		if(folderManager.remoteFileExists(songName.getText())) {
+		if(folderManager.localFileExists(songName.getText())) {
 			buttonPlay.setDisable(false);
 			buttonMove.setDisable(true);
 		} else {

@@ -51,8 +51,8 @@ public class SettingsController implements Initializable {
 	@FXML
 	public void onSaveButtonClick(ActionEvent actionEvent) {
 		// Change the remote folder path
-		Configuration.getInstance().setRemoteFolderPath(newFolderPath);
-		FolderManager.getInstance().changeRemoteFolder(new MonitorFolder(newFolderPath));
+		Configuration.getInstance().setLocalFolderPath(newFolderPath);
+		FolderManager.getInstance().changeLocalFolder(new MonitorFolder(newFolderPath));
 		closeWindow();
 	}
 		
@@ -65,7 +65,7 @@ public class SettingsController implements Initializable {
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		textFieldPath.setText(Configuration.getInstance().getRemoteFolderPath());
+		textFieldPath.setText(Configuration.getInstance().getLocalFolderPath());
 		textFieldPath.setDisable(true);
 		stage = new Stage();
 	} 

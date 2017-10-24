@@ -21,9 +21,9 @@
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
-                  <Label layoutX="34.0" layoutY="95.0" text="Current Remote Folder" />
+                  <Label layoutX="34.0" layoutY="95.0" text="Current local folder" />
                   <TextField fx:id="textFieldPath" layoutX="34.0" layoutY="129.0" prefHeight="26.0" prefWidth="266.0" />
-                  <Button fx:id="buttonChangeFolder" onAction="#onChangeFolderClick" layoutX="34.0" layoutY="175.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="123.0" text="Change folder" />
+                  <Button fx:id="buttonChangeFolder" onAction="#onChangeFolderClick" layoutX="34.0" layoutY="175.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="123.0" text="Change local folder" />
                   <Button fx:id="buttonCancel" onAction="#onCancelButtonClick" layoutX="34.0" layoutY="251.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="97.0" text="Cancel" />
                   <Button fx:id="buttonSave" onAction="#onSaveButtonClick" layoutX="195.0" layoutY="251.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="96.0" text="Save" />
                </children>
