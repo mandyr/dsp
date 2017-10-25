@@ -2,6 +2,8 @@ package services;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Observable;
+import java.util.Observer;
 
 import application.Configuration;
 import javafx.collections.FXCollections;
@@ -30,7 +32,7 @@ public class FolderManager {
 	
 	private FolderManager() {
 		configInstance = Configuration.getInstance();
-		monitorFolderLocal = new MonitorFolder(configInstance.getLocalFolderPath());
+		monitorFolderLocal = new MonitorFolder(configInstance.getLocalFolderPath());	
 	}
 	
 	public MonitorFolder getMonitorFolderLocal() {
@@ -88,4 +90,5 @@ public class FolderManager {
 	public void changeLocalFolder(MonitorFolder newMonitorFolder) {
 		this.monitorFolderLocal = newMonitorFolder;
 	}
+
 }

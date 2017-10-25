@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.ResourceBundle;
 
+import application.Configuration;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -21,16 +24,18 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import services.BackgroundService;
+import services.FileCopier;
 import services.FolderManager;
 import services.MonitorFolder;
 
-public class MyMediaPlayerController implements Initializable {
+public class MyMediaPlayerController implements Initializable, Observer {
 
 	@FXML
 	private Label folderName;
@@ -45,7 +50,7 @@ public class MyMediaPlayerController implements Initializable {
 	private Button buttonSettings;
 	
 	@FXML
-	private Button buttonRefresh;
+	private Button buttonUpload;
 	
 	@FXML
 	private ListView listViewFiles;
@@ -58,10 +63,9 @@ public class MyMediaPlayerController implements Initializable {
 		stage = new Stage();
 		folderManager = FolderManager.getInstance();
 		//buttonSettings.setDisable(true);
-		aboveListview.setText("List of files from remote folder\n "
-				+ "You can only play the song if it is in the local folder\n "
-				+ "To move the file to local folder press 'move'");
-		
+		aboveListview.setText("List of files from remote folder\n"
+				+ "You can only play the song if it is in the local folder\n"
+				+ "To move the file to local folder press 'move'");		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -72,20 +76,13 @@ public class MyMediaPlayerController implements Initializable {
         if (selectedDirectory != null) {
             folderName.setText("Selected Folder: " + selectedDirectory.getName());
             folderManager.setMonitorFolderRemote(new MonitorFolder(selectedDirectory.getAbsolutePath()));
+            folderManager.getMonitorFolderRemote().addObserver(this);
             updateListView();
             
          // From now on start observing the folder
 			Thread observeMonitor = new Thread(() -> { 
 				while(true) {
-					if(folderManager.getMonitorFolderRemote().checkForChange()) {
-						Platform.runLater(new Runnable() {
-				            @Override
-				            public void run() {
-				                // Update UI here.
-				            	updateListView();
-				            }
-				        });
-					}	
+					folderManager.getMonitorFolderRemote().checkForChange();
 				}
 			});
 			
@@ -95,7 +92,7 @@ public class MyMediaPlayerController implements Initializable {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void updateListView() {
+	private void updateListView() {
 		listViewFiles.setItems(folderManager.getRemoteFileNames());
         listViewFiles.setCellFactory(new Callback<ListView<String>,javafx.scene.control.ListCell<String>>(){
         	
@@ -126,8 +123,34 @@ public class MyMediaPlayerController implements Initializable {
 	}
 	
 	@FXML
-	public void onRefreshClick(ActionEvent actionEvent) {
-		updateListView();
+	public void onUploadClick(ActionEvent actionEvent) {
+		// Open file chooser dialog
+		FileChooser fileChooser = new FileChooser();
+		File selectedFile = fileChooser.showOpenDialog(stage);
+		
+		// open file and copy it to other folder
+		CellController cellCtrl = null;
+		String newfileName = selectedFile.getName();
+		String newFilePath = folderManager.getMonitorFolderRemote().getFolderPath() + File.separator + newfileName;
+		
+		FileCopier<Void> fileCopier = new FileCopier<>(folderManager.getMonitorFolderLocal(), newFilePath, newfileName, cellCtrl);
+		
+		try {
+			BackgroundService.getExecuterService().submit(fileCopier);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+				
 	}
 
+	@Override
+	public void update(Observable o, Object arg) {
+		Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                // Update UI here.
+            	updateListView();
+            }
+        });
+	}
 }

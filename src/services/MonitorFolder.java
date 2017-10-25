@@ -117,6 +117,7 @@ public class MonitorFolder extends Observable implements ReadFolders  {
 	    		observableListOfFiles.add(fileEntry);
 	    		result = true;
 	    		setChanged();
+	    		notifyObservers();
 	        }
 	    }
 	    

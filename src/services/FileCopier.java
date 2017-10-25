@@ -36,8 +36,10 @@ public class FileCopier <Void> extends Task<Void> {
 	            @Override
 	            public void run() {
 	                // Update UI here.
-	            	cellController.setSong(fileName);
-	            	cellController.checkFileLocation();
+	            	if(cellController!=null) {
+	            		cellController.setSong(fileName);
+	            		cellController.checkFileLocation();
+	            	}	
 	            }
 	        });
 	    }
