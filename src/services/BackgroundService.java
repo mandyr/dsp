@@ -7,9 +7,7 @@ public class BackgroundService {
 	
 	private static ExecutorService exService;
 	
-	private BackgroundService() {
-		
-	}
+	private BackgroundService() { }
 	
 	public static ExecutorService getExecuterService() {
 		if(exService== null)
